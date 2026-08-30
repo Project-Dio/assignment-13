@@ -35,244 +35,245 @@ const STORAGE_KEY = "kanban_tasks";
 // LOCAL STORAGE
 // ============================================
 function loadTasks() {
-  const storedTasks = localStorage.getItem(STORAGE_KEY);
-  if (!storedTasks) {
-    tasks = [];
-    return;
-  }
-  try {
-    const parsedTasks = JSON.parse(storedTasks);
-    if (Array.isArray(parsedTasks)) {
-      tasks = parsedTasks;
-    } else {
-      tasks = [];
+    const storedTasks = localStorage.getItem(STORAGE_KEY);
+    if (!storedTasks) {
+        tasks = [];
+        return;
     }
-  } catch (error) {
-    console.error("Failed to load tasks:", error);
-    tasks = [];
-  }
+    try {
+        const parsedTasks = JSON.parse(storedTasks);
+        if (Array.isArray(parsedTasks)) {
+            tasks = parsedTasks;
+        }
+        else {
+            tasks = [];
+        }
+    }
+    catch (error) {
+        console.error("Failed to load tasks:", error);
+        tasks = [];
+    }
 }
 function saveTasks() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 // ============================================
 // MODAL
 // ============================================
 function openModal() {
-  modalOverlay.classList.remove("hidden");
-  modalOverlay.classList.add("flex");
-  setTimeout(() => {
-    taskTitle.focus();
-  }, 100);
+    modalOverlay.classList.remove("hidden");
+    modalOverlay.classList.add("flex");
+    setTimeout(() => {
+        taskTitle.focus();
+    }, 100);
 }
 function closeModal() {
-  modalOverlay.classList.add("hidden");
-  modalOverlay.classList.remove("flex");
-  resetForm();
+    modalOverlay.classList.add("hidden");
+    modalOverlay.classList.remove("flex");
+    resetForm();
 }
 function openCreateModal() {
-  editingTaskId = null;
-  modalTitle.innerHTML = `
+    editingTaskId = null;
+    modalTitle.innerHTML = `
     <i class="fa-solid fa-plus-circle text-indigo-500"></i>
     Create New Task
   `;
-  modalIcon.className = "fa-solid fa-plus-circle text-indigo-500";
-  submitBtnText.textContent = "Add Task";
-  taskForm.reset();
-  taskPriority.value = "medium";
-  clearErrors();
-  updateCharacterCount();
-  openModal();
+    modalIcon.className = "fa-solid fa-plus-circle text-indigo-500";
+    submitBtnText.textContent = "Add Task";
+    taskForm.reset();
+    taskPriority.value = "medium";
+    clearErrors();
+    updateCharacterCount();
+    openModal();
 }
 function openEditModal(task) {
-  editingTaskId = task.id;
-  modalTitle.innerHTML = `
+    editingTaskId = task.id;
+    modalTitle.innerHTML = `
     <i class="fa-solid fa-pen-to-square text-indigo-500"></i>
     Edit Task
   `;
-  modalIcon.className = "fa-solid fa-pen-to-square text-indigo-500";
-  submitBtnText.textContent = "Update Task";
-  taskTitle.value = task.title;
-  taskPriority.value = task.priority;
-  taskDueDate.value = task.dueDate;
-  taskDescription.value = task.description;
-  clearErrors();
-  updateCharacterCount();
-  openModal();
+    modalIcon.className = "fa-solid fa-pen-to-square text-indigo-500";
+    submitBtnText.textContent = "Update Task";
+    taskTitle.value = task.title;
+    taskPriority.value = task.priority;
+    taskDueDate.value = task.dueDate;
+    taskDescription.value = task.description;
+    clearErrors();
+    updateCharacterCount();
+    openModal();
 }
 // ============================================
 // FORM
 // ============================================
 function resetForm() {
-  taskForm.reset();
-  taskPriority.value = "medium";
-  editingTaskId = null;
-  clearErrors();
-  updateCharacterCount();
+    taskForm.reset();
+    taskPriority.value = "medium";
+    editingTaskId = null;
+    clearErrors();
+    updateCharacterCount();
 }
 function clearErrors() {
-  titleError.textContent = "";
-  dateError.textContent = "";
-  descriptionError.textContent = "";
-  titleError.classList.add("hidden");
-  dateError.classList.add("hidden");
-  descriptionError.classList.add("hidden");
-  taskTitle.classList.remove("border-red-500");
-  taskDueDate.classList.remove("border-red-500");
-  taskDescription.classList.remove("border-red-500");
+    titleError.textContent = "";
+    dateError.textContent = "";
+    descriptionError.textContent = "";
+    titleError.classList.add("hidden");
+    dateError.classList.add("hidden");
+    descriptionError.classList.add("hidden");
+    taskTitle.classList.remove("border-red-500");
+    taskDueDate.classList.remove("border-red-500");
+    taskDescription.classList.remove("border-red-500");
 }
 function showError(element, input, message) {
-  element.textContent = message;
-  element.classList.remove("hidden");
-  input.classList.add("border-red-500");
+    element.textContent = message;
+    element.classList.remove("hidden");
+    input.classList.add("border-red-500");
 }
 function validateForm() {
-  clearErrors();
-  let isValid = true;
-  const title = taskTitle.value.trim();
-  const description = taskDescription.value.trim();
-  const dueDate = taskDueDate.value;
-  // Title validation
-  if (!title) {
-    showError(titleError, taskTitle, "Task title is required.");
-    isValid = false;
-  } else if (title.length < 3) {
-    showError(
-      titleError,
-      taskTitle,
-      "Task title must be at least 3 characters.",
-    );
-    isValid = false;
-  }
-  // Description validation
-  if (description.length > 500) {
-    showError(
-      descriptionError,
-      taskDescription,
-      "Description cannot exceed 500 characters.",
-    );
-    isValid = false;
-  }
-  // Date validation
-  if (dueDate) {
-    const selectedDate = new Date(dueDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    selectedDate.setHours(0, 0, 0, 0);
-    if (selectedDate < today) {
-      showError(dateError, taskDueDate, "Due date cannot be in the past.");
-      isValid = false;
+    clearErrors();
+    let isValid = true;
+    const title = taskTitle.value.trim();
+    const description = taskDescription.value.trim();
+    const dueDate = taskDueDate.value;
+    // Title validation
+    if (!title) {
+        showError(titleError, taskTitle, "Task title is required.");
+        isValid = false;
     }
-  }
-  return isValid;
+    else if (title.length < 3) {
+        showError(titleError, taskTitle, "Task title must be at least 3 characters.");
+        isValid = false;
+    }
+    // Description validation
+    if (description.length > 500) {
+        showError(descriptionError, taskDescription, "Description cannot exceed 500 characters.");
+        isValid = false;
+    }
+    // Date validation
+    if (dueDate) {
+        const selectedDate = new Date(dueDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        selectedDate.setHours(0, 0, 0, 0);
+        if (selectedDate < today) {
+            showError(dateError, taskDueDate, "Due date cannot be in the past.");
+            isValid = false;
+        }
+    }
+    return isValid;
 }
 function updateCharacterCount() {
-  const length = taskDescription.value.length;
-  charCount.textContent = `${length}/500`;
+    const length = taskDescription.value.length;
+    charCount.textContent = `${length}/500`;
 }
 // ============================================
 // CREATE
 // ============================================
 function createTask() {
-  const newTask = {
-    id: crypto.randomUUID(),
-    title: taskTitle.value.trim(),
-    description: taskDescription.value.trim(),
-    priority: taskPriority.value,
-    dueDate: taskDueDate.value,
-    status: "todo",
-    createdAt: new Date().toISOString(),
-  };
-  tasks.push(newTask);
-  saveTasks();
-  renderTasks();
-  closeModal();
+    const newTask = {
+        id: crypto.randomUUID(),
+        title: taskTitle.value.trim(),
+        description: taskDescription.value.trim(),
+        priority: taskPriority.value,
+        dueDate: taskDueDate.value,
+        status: "todo",
+        createdAt: new Date().toISOString(),
+    };
+    tasks.push(newTask);
+    saveTasks();
+    renderTasks();
+    closeModal();
 }
 // ============================================
 // UPDATE
 // ============================================
 function updateTask() {
-  if (!editingTaskId) return;
-  const taskIndex = tasks.findIndex((task) => task.id === editingTaskId);
-  if (taskIndex === -1) return;
-  const oldTask = tasks[taskIndex];
-  const updatedTask = {
-    ...oldTask,
-    title: taskTitle.value.trim(),
-    description: taskDescription.value.trim(),
-    priority: taskPriority.value,
-    dueDate: taskDueDate.value,
-  };
-  tasks[taskIndex] = updatedTask;
-  saveTasks();
-  renderTasks();
-  closeModal();
+    if (!editingTaskId)
+        return;
+    const taskIndex = tasks.findIndex((task) => task.id === editingTaskId);
+    if (taskIndex === -1)
+        return;
+    const oldTask = tasks[taskIndex];
+    const updatedTask = {
+        ...oldTask,
+        title: taskTitle.value.trim(),
+        description: taskDescription.value.trim(),
+        priority: taskPriority.value,
+        dueDate: taskDueDate.value,
+    };
+    tasks[taskIndex] = updatedTask;
+    saveTasks();
+    renderTasks();
+    closeModal();
 }
 // ============================================
 // DELETE
 // ============================================
 function deleteTask(taskId) {
-  const task = tasks.find((task) => task.id === taskId);
-  if (!task) return;
-  const confirmed = true;
-  if (!confirmed) return;
-  tasks = tasks.filter((task) => task.id !== taskId);
-  saveTasks();
-  renderTasks();
+    const task = tasks.find((task) => task.id === taskId);
+    if (!task)
+        return;
+    const confirmed = confirm(`Are you sure you want to delete "${task.title}"?`);
+    if (!confirmed)
+        return;
+    tasks = tasks.filter((task) => task.id !== taskId);
+    saveTasks();
+    renderTasks();
 }
 // ============================================
 // CHANGE STATUS
 // ============================================
 function updateTaskStatus(taskId, newStatus) {
-  const task = tasks.find((task) => task.id === taskId);
-  if (!task) return;
-  task.status = newStatus;
-  saveTasks();
-  renderTasks();
+    const task = tasks.find((task) => task.id === taskId);
+    if (!task)
+        return;
+    task.status = newStatus;
+    saveTasks();
+    renderTasks();
 }
 // ============================================
 // GET TASKS BY STATUS
 // ============================================
 function getTasksByStatus(status) {
-  return tasks.filter((task) => task.status === status);
+    return tasks.filter((task) => task.status === status);
 }
 // ============================================
 // FORMAT DATE
 // ============================================
 function formatDate(date) {
-  if (!date) return "No due date";
-  const dateObject = new Date(`${date}T00:00:00`);
-  return dateObject.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+    if (!date)
+        return "No due date";
+    const dateObject = new Date(`${date}T00:00:00`);
+    return dateObject.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    });
 }
 // ============================================
 // PRIORITY
 // ============================================
 function getPriorityClasses(priority) {
-  switch (priority) {
-    case "low":
-      return "bg-emerald-50 text-emerald-600";
-    case "medium":
-      return "bg-amber-50 text-amber-600";
-    case "high":
-      return "bg-red-50 text-red-600";
-    default:
-      return "bg-slate-50 text-slate-600";
-  }
+    switch (priority) {
+        case "low":
+            return "bg-emerald-50 text-emerald-600";
+        case "medium":
+            return "bg-amber-50 text-amber-600";
+        case "high":
+            return "bg-red-50 text-red-600";
+        default:
+            return "bg-slate-50 text-slate-600";
+    }
 }
 // ============================================
 // CREATE TASK CARD
 // ============================================
 function createTaskCard(task) {
-  const card = document.createElement("div");
-  card.className =
-    "task-card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all cursor-grab";
-  card.dataset.taskId = task.id;
-  card.draggable = true;
-  card.innerHTML = `
+    const card = document.createElement("div");
+    card.className =
+        "task-card bg-white rounded-xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all cursor-grab";
+    card.dataset.taskId = task.id;
+    card.draggable = true;
+    card.innerHTML = `
     <div class="flex items-start justify-between gap-3">
 
       <div class="flex-1 min-w-0">
@@ -281,15 +282,13 @@ function createTaskCard(task) {
           ${escapeHtml(task.title)}
         </h3>
 
-        ${
-          task.description
-            ? `
+        ${task.description
+        ? `
               <p class="text-sm text-slate-500 mt-2 break-words">
                 ${escapeHtml(task.description)}
               </p>
             `
-            : ""
-        }
+        : ""}
 
       </div>
 
@@ -337,16 +336,14 @@ function createTaskCard(task) {
         ${task.priority}
       </span>
 
-      ${
-        task.dueDate
-          ? `
+      ${task.dueDate
+        ? `
             <span class="text-xs text-slate-400 flex items-center gap-1">
               <i class="fa-regular fa-calendar"></i>
               ${formatDate(task.dueDate)}
             </span>
           `
-          : ""
-      }
+        : ""}
 
     </div>
 
@@ -370,75 +367,75 @@ function createTaskCard(task) {
 
     </div>
   `;
-  addCardEventListeners(card, task);
-  return card;
+    addCardEventListeners(card, task);
+    return card;
 }
 // ============================================
 // ESCAPE HTML
 // Prevent HTML injection
 // ============================================
 function escapeHtml(value) {
-  const div = document.createElement("div");
-  div.textContent = value;
-  return div.innerHTML;
+    const div = document.createElement("div");
+    div.textContent = value;
+    return div.innerHTML;
 }
 // ============================================
 // CARD EVENTS
 // ============================================
 function addCardEventListeners(card, task) {
-  const menuButton = card.querySelector(".task-menu-btn");
-  const menu = card.querySelector(".task-menu");
-  const editButton = card.querySelector(".edit-task-btn");
-  const deleteButton = card.querySelector(".delete-task-btn");
-  const statusSelect = card.querySelector(".status-select");
-  // Open / close menu
-  menuButton.addEventListener("click", (event) => {
-    event.stopPropagation();
-    document.querySelectorAll(".task-menu").forEach((otherMenu) => {
-      if (otherMenu !== menu) {
-        otherMenu.classList.add("hidden");
-      }
+    const menuButton = card.querySelector(".task-menu-btn");
+    const menu = card.querySelector(".task-menu");
+    const editButton = card.querySelector(".edit-task-btn");
+    const deleteButton = card.querySelector(".delete-task-btn");
+    const statusSelect = card.querySelector(".status-select");
+    // Open / close menu
+    menuButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        document.querySelectorAll(".task-menu").forEach((otherMenu) => {
+            if (otherMenu !== menu) {
+                otherMenu.classList.add("hidden");
+            }
+        });
+        menu.classList.toggle("hidden");
     });
-    menu.classList.toggle("hidden");
-  });
-  // Edit
-  editButton.addEventListener("click", () => {
-    menu.classList.add("hidden");
-    openEditModal(task);
-  });
-  // Delete
-  deleteButton.addEventListener("click", () => {
-    menu.classList.add("hidden");
-    deleteTask(task.id);
-  });
-  // Change status
-  statusSelect.addEventListener("change", () => {
-    updateTaskStatus(task.id, statusSelect.value);
-  });
-  // Drag start
-  card.addEventListener("dragstart", () => {
-    card.classList.add("opacity-50");
-    card.dataset.dragging = "true";
-  });
-  // Drag end
-  card.addEventListener("dragend", () => {
-    card.classList.remove("opacity-50");
-    delete card.dataset.dragging;
-  });
+    // Edit
+    editButton.addEventListener("click", () => {
+        menu.classList.add("hidden");
+        openEditModal(task);
+    });
+    // Delete
+    deleteButton.addEventListener("click", () => {
+        menu.classList.add("hidden");
+        deleteTask(task.id);
+    });
+    // Change status
+    statusSelect.addEventListener("change", () => {
+        updateTaskStatus(task.id, statusSelect.value);
+    });
+    // Drag start
+    card.addEventListener("dragstart", () => {
+        card.classList.add("opacity-50");
+        card.dataset.dragging = "true";
+    });
+    // Drag end
+    card.addEventListener("dragend", () => {
+        card.classList.remove("opacity-50");
+        delete card.dataset.dragging;
+    });
 }
 // ============================================
 // RENDER
 // ============================================
 function renderTasks() {
-  renderColumn(todoContainer, getTasksByStatus("todo"));
-  renderColumn(inProgressContainer, getTasksByStatus("in-progress"));
-  renderColumn(completedContainer, getTasksByStatus("completed"));
-  updateTaskCounts();
+    renderColumn(todoContainer, getTasksByStatus("todo"));
+    renderColumn(inProgressContainer, getTasksByStatus("in-progress"));
+    renderColumn(completedContainer, getTasksByStatus("completed"));
+    updateTaskCounts();
 }
 function renderColumn(container, columnTasks) {
-  container.innerHTML = "";
-  if (columnTasks.length === 0) {
-    container.innerHTML = `
+    container.innerHTML = "";
+    if (columnTasks.length === 0) {
+        container.innerHTML = `
       <div class="flex flex-col items-center justify-center py-12 text-slate-400">
         <i class="fa-regular fa-folder-open text-4xl mb-3 opacity-50"></i>
 
@@ -451,110 +448,126 @@ function renderColumn(container, columnTasks) {
         </p>
       </div>
     `;
-    return;
-  }
-  columnTasks.forEach((task) => {
-    const card = createTaskCard(task);
-    container.appendChild(card);
-  });
+        return;
+    }
+    columnTasks.forEach((task) => {
+        const card = createTaskCard(task);
+        container.appendChild(card);
+    });
 }
 // ============================================
 // TASK COUNTS
 // ============================================
 function updateTaskCounts() {
-  columns.forEach((column) => {
-    const status = column.dataset.status;
-    const count = getTasksByStatus(status).length;
-    const countElement = column.querySelector("p.text-xs");
-    if (!countElement) return;
-    countElement.textContent = `${count} ${count === 1 ? "task" : "tasks"}`;
-  });
+    columns.forEach((column) => {
+        const status = column.dataset.status;
+        const count = getTasksByStatus(status).length;
+        const countElement = column.querySelector("p.text-xs");
+        if (!countElement)
+            return;
+        countElement.textContent = `${count} ${count === 1 ? "task" : "tasks"}`;
+    });
 }
 // ============================================
 // DRAG & DROP
 // ============================================
 function setupDragAndDrop() {
-  columns.forEach((column) => {
-    const status = column.dataset.status;
-    const container = column.querySelector(`[id^="tasks-"]`);
-    if (!container) return;
-    container.addEventListener("dragover", (event) => {
-      event.preventDefault();
-      column.classList.add("ring-2", "ring-indigo-300");
+    columns.forEach((column) => {
+        const status = column.dataset.status;
+        const container = column.querySelector(`[id^="tasks-"]`);
+        if (!container)
+            return;
+        container.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            column.classList.add("ring-2", "ring-indigo-300");
+        });
+        container.addEventListener("dragleave", () => {
+            column.classList.remove("ring-2", "ring-indigo-300");
+        });
+        container.addEventListener("drop", (event) => {
+            event.preventDefault();
+            column.classList.remove("ring-2", "ring-indigo-300");
+            const draggedCard = document.querySelector('[data-dragging="true"]');
+            if (!draggedCard)
+                return;
+            const taskId = draggedCard.dataset.taskId;
+            if (!taskId)
+                return;
+            updateTaskStatus(taskId, status);
+        });
     });
-    container.addEventListener("dragleave", () => {
-      column.classList.remove("ring-2", "ring-indigo-300");
-    });
-    container.addEventListener("drop", (event) => {
-      event.preventDefault();
-      column.classList.remove("ring-2", "ring-indigo-300");
-      const draggedCard = document.querySelector('[data-dragging="true"]');
-      if (!draggedCard) return;
-      const taskId = draggedCard.dataset.taskId;
-      if (!taskId) return;
-      updateTaskStatus(taskId, status);
-    });
-  });
 }
 // ============================================
 // CLOSE MENUS WHEN CLICKING OUTSIDE
 // ============================================
 document.addEventListener("click", () => {
-  document.querySelectorAll(".task-menu").forEach((menu) => {
-    menu.classList.add("hidden");
-  });
+    document.querySelectorAll(".task-menu").forEach((menu) => {
+        menu.classList.add("hidden");
+    });
 });
 // ============================================
 // EVENTS
 // ============================================
 // Add task
 addTaskBtn.addEventListener("click", () => {
-  openCreateModal();
+    openCreateModal();
 });
 // Close modal
 closeModalBtn.addEventListener("click", () => {
-  closeModal();
+    closeModal();
 });
 // Cancel
 cancelBtn.addEventListener("click", () => {
-  closeModal();
+    closeModal();
 });
 // Click outside modal
 modalOverlay.addEventListener("click", (event) => {
-  if (event.target === modalOverlay) {
-    closeModal();
-  }
+    if (event.target === modalOverlay) {
+        closeModal();
+    }
 });
 // Escape key
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    if (!modalOverlay.classList.contains("hidden")) {
-      closeModal();
+    if (event.key === "Escape") {
+        if (!modalOverlay.classList.contains("hidden")) {
+            closeModal();
+        }
     }
-  }
 });
 // Character counter
 taskDescription.addEventListener("input", () => {
-  updateCharacterCount();
+    updateCharacterCount();
 });
 // Form submit
 taskForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const isValid = validateForm();
-  if (!isValid) return;
-  if (editingTaskId) {
-    updateTask();
-  } else {
-    createTask();
-  }
+    event.preventDefault();
+    const isValid = validateForm();
+    if (!isValid)
+        return;
+    if (editingTaskId) {
+        updateTask();
+    }
+    else {
+        createTask();
+    }
 });
+function setMinDueDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    const todayString = `${year}-${month}-${day}`;
+    taskDueDate.min = todayString;
+    taskDueDate.value = todayString;
+}
 // ============================================
 // INITIALIZATION
 // ============================================
 function init() {
-  loadTasks();
-  renderTasks();
-  setupDragAndDrop();
-  updateCharacterCount();
+    loadTasks();
+    renderTasks();
+    setupDragAndDrop();
+    updateCharacterCount();
+    setMinDueDate();
 }
 init();

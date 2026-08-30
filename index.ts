@@ -781,7 +781,18 @@ taskForm.addEventListener("submit", (event) => {
     createTask();
   }
 });
+function setMinDueDate(): void {
+  const today = new Date();
 
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  const todayString = `${year}-${month}-${day}`;
+
+  taskDueDate.min = todayString;
+  taskDueDate.value = todayString;
+}
 // ============================================
 // INITIALIZATION
 // ============================================
@@ -794,6 +805,8 @@ function init(): void {
   setupDragAndDrop();
 
   updateCharacterCount();
+
+  setMinDueDate();
 }
 
 init();
